@@ -13,6 +13,12 @@ import Timer from "./Timer";
 
 const SECS_PER_QUESTION = 30;
 
+const POINTS_PER_DIFFICULTY = {
+  junior: 10,
+  middle: 20,
+  senior: 30,
+};
+
 const initialState = {
   questions: [],
 
@@ -23,6 +29,7 @@ const initialState = {
   points: 0,
   highscore: 0,
   secondsRemaining: null,
+  difficulty: "junior",
 };
 
 function reducer(state, action) {
@@ -36,6 +43,12 @@ function reducer(state, action) {
         ...state,
         status: "active",
         secondsRemaining: state.questions.length * SECS_PER_QUESTION,
+        questions: state.questions
+          .filter(
+            (question) =>
+              question.points === POINTS_PER_DIFFICULTY[state.difficulty]
+          )
+          .sort(() => Math.random() - 0.5),
       };
     case "newAnswer":
       const question = state.questions.at(state.index);
@@ -58,7 +71,7 @@ function reducer(state, action) {
           state.points > state.highscore ? state.points : state.highscore,
       };
     case "restart":
-      return { ...initialState, question: state.questions, status: "ready" };
+      return { ...initialState, questions: state.questions, status: "ready" };
     // return {
     //   ...state,
     //   poimts: 0,
@@ -73,6 +86,9 @@ function reducer(state, action) {
         secondsRemaining: state.secondsRemaining - 1,
         status: state.secondsRemaining === 0 ? "finished" : state.status,
       };
+    case "chooseDifficulty":
+      console.log(action.payload);
+      return { ...state, difficulty: action.payload };
     default:
       throw new Error("Action unknown");
   }
