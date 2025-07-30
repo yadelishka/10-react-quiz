@@ -123,6 +123,7 @@ export default function App() {
       secondsRemaining,
       numQuestions,
       filteredQuestions,
+      difficulty,
     },
     dispatch,
   ] = useReducer(reducer, initialState);
@@ -180,6 +181,7 @@ export default function App() {
             maxPossiblePoints={maxPossiblePoints}
             highscore={highscore}
             dispatch={dispatch}
+            difficulty={difficulty}
           />
         )}
       </Main>
