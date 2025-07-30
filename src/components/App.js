@@ -32,6 +32,7 @@ const initialState = {
   secondsRemaining: null,
   difficulty: "junior",
   numQuestions: 0,
+  answers: [],
 };
 
 function reducer(state, action) {
@@ -63,13 +64,17 @@ function reducer(state, action) {
     case "newAnswer":
       const question = state.questions.at(state.index);
 
+      const newAnswers = [...state.answers];
+
+      newAnswers[state.index] = action.payload;
+
+      const isCorrect = action.payload === question.correctAnswer;
+
       return {
         ...state,
+        answers: newAnswers,
         answer: action.payload,
-        points:
-          action.payload === question.correctAnswer
-            ? state.points + question.points
-            : state.points,
+        points: isCorrect ? state.points + question.points : state.points,
       };
     case "nextQuestion":
       return { ...state, index: state.index + 1, answer: null };
@@ -124,6 +129,7 @@ export default function App() {
       numQuestions,
       filteredQuestions,
       difficulty,
+      answers,
     },
     dispatch,
   ] = useReducer(reducer, initialState);
@@ -163,6 +169,8 @@ export default function App() {
               question={questions[index]}
               dispatch={dispatch}
               answer={answer}
+              answers={answers}
+              currentIndex={index}
             />
             <Footer>
               <Timer initialSeconds={secondsRemaining} dispatch={dispatch} />
