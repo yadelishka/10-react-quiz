@@ -1,19 +1,30 @@
-import { useEffect } from "react";
+import { useState, useEffect } from "react";
 
-function Timer({ dispatch, secondsRemaining }) {
+function Timer({ initialSeconds, dispatch }) {
+  const [secondsRemaining, setSecondsRemaining] = useState(initialSeconds);
+
+  useEffect(() => {
+    if (secondsRemaining <= 0) {
+      dispatch({ type: "tick", payload: 0 });
+      return;
+    }
+
+    const timerId = setInterval(() => {
+      setSecondsRemaining((prev) => {
+        if (prev <= 1) {
+          clearInterval(timerId);
+          dispatch({ type: "tick", payload: 0 });
+          return 0;
+        }
+        return prev - 1;
+      });
+    }, 1000);
+
+    return () => clearInterval(timerId);
+  }, [dispatch, secondsRemaining]);
+
   const mins = Math.floor(secondsRemaining / 60);
   const seconds = secondsRemaining % 60;
-
-  useEffect(
-    function () {
-      const id = setInterval(function () {
-        //dispatch({ type: "tick" });
-      }, 1000);
-
-      return () => clearInterval(id);
-    },
-    [dispatch]
-  );
 
   return (
     <div className="timer">

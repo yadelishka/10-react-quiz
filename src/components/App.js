@@ -21,6 +21,7 @@ const POINTS_PER_DIFFICULTY = {
 
 const initialState = {
   questions: [],
+  filteredQuestions: [],
 
   // 'loading', 'error', 'ready', 'active', 'finished'
   status: "loading",
@@ -30,25 +31,34 @@ const initialState = {
   highscore: 0,
   secondsRemaining: null,
   difficulty: "junior",
+  numQuestions: 0,
 };
 
 function reducer(state, action) {
   switch (action.type) {
     case "dataRecieved":
-      return { ...state, questions: action.payload, status: "ready" };
+      const filtered = action.payload.filter(
+        (question) =>
+          question.points === POINTS_PER_DIFFICULTY[state.difficulty]
+      );
+      return {
+        ...state,
+        questions: action.payload,
+        filteredQuestions: filtered,
+        numQuestions: filtered.length,
+        status: "ready",
+      };
     case "dataFailed":
       return { ...state, status: "error" };
     case "start":
       return {
         ...state,
         status: "active",
-        secondsRemaining: state.questions.length * SECS_PER_QUESTION,
-        questions: state.questions
-          .filter(
-            (question) =>
-              question.points === POINTS_PER_DIFFICULTY[state.difficulty]
-          )
-          .sort(() => Math.random() - 0.5),
+        secondsRemaining: state.filteredQuestions.length * SECS_PER_QUESTION,
+        questions: state.filteredQuestions.sort(() => Math.random() - 0.5),
+        index: 0,
+        answer: null,
+        points: 0,
       };
     case "newAnswer":
       const question = state.questions.at(state.index);
@@ -83,12 +93,19 @@ function reducer(state, action) {
     case "tick":
       return {
         ...state,
-        secondsRemaining: state.secondsRemaining - 1,
-        status: state.secondsRemaining === 0 ? "finished" : state.status,
+        secondsRemaining: action.payload,
+        status: action.payload === 0 ? "finished" : state.status,
       };
     case "chooseDifficulty":
-      console.log(action.payload);
-      return { ...state, difficulty: action.payload };
+      const filteredQuestions = state.questions.filter(
+        (q) => q.points === POINTS_PER_DIFFICULTY[action.payload]
+      );
+      return {
+        ...state,
+        difficulty: action.payload,
+        filteredQuestions,
+        numQuestions: filteredQuestions.length,
+      };
     default:
       throw new Error("Action unknown");
   }
@@ -96,12 +113,21 @@ function reducer(state, action) {
 
 export default function App() {
   const [
-    { questions, status, index, answer, points, highscore, secondsRemaining },
+    {
+      questions,
+      status,
+      index,
+      answer,
+      points,
+      highscore,
+      secondsRemaining,
+      numQuestions,
+      filteredQuestions,
+    },
     dispatch,
   ] = useReducer(reducer, initialState);
 
-  const numQuestions = questions.length;
-  const maxPossiblePoints = questions.reduce(
+  const maxPossiblePoints = filteredQuestions.reduce(
     (prev, cur) => prev + cur.points,
     0
   );
@@ -138,7 +164,7 @@ export default function App() {
               answer={answer}
             />
             <Footer>
-              <Timer dispatch={dispatch} secondsRemaining={secondsRemaining} />
+              <Timer initialSeconds={secondsRemaining} dispatch={dispatch} />
               <NextButton
                 dispatch={dispatch}
                 answer={answer}
