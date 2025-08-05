@@ -1,19 +1,9 @@
 import { useState, useEffect } from "react";
-import { useQuiz } from "../contexts/QuizContext";
 
-function Timer() {
-  const { secondsRemaining: initialSecondsFromContext, dispatch } = useQuiz();
-  const [secondsRemaining, setSecondsRemaining] = useState(
-    initialSecondsFromContext
-  );
+function Timer({ initialSeconds, dispatch }) {
+  const [secondsRemaining, setSecondsRemaining] = useState(initialSeconds);
 
   useEffect(() => {
-    setSecondsRemaining(initialSecondsFromContext);
-  }, [initialSecondsFromContext]);
-
-  useEffect(() => {
-    if (secondsRemaining === null) return;
-
     if (secondsRemaining <= 0) {
       dispatch({ type: "tick", payload: 0 });
       return;
