@@ -1,6 +1,15 @@
+import { useEffect, useRef, useState } from "react";
 import { useQuiz } from "../contexts/QuizContext";
 
 function StartScreen() {
+  const buttonRef = useRef();
+  const [test, setTest] = useState("test");
+  console.log(buttonRef.current);
+
+  useEffect(function () {
+    console.log(buttonRef.current.getBoundingClientRect());
+  }, []);
+
   const { numQuestions, dispatch } = useQuiz();
   return (
     <div className="start">
@@ -21,9 +30,13 @@ function StartScreen() {
         <button
           className="btn btn-ui"
           onClick={() => dispatch({ type: "start" })}
+          ref={buttonRef}
         >
           Let's start
         </button>
+        {/* <button className="btn btn-ui" onClick={() => setTest("clicked")}>
+          Let's start
+        </button> */}
       </div>
     </div>
   );
