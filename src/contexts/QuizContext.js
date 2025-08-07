@@ -95,7 +95,7 @@ function reducer(state, action) {
         highscore: state.highscore,
         status: "ready",
       };
-    case "tick":
+    case "finishTimer":
       return {
         ...state,
         secondsRemaining: action.payload,

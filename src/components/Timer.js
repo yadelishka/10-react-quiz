@@ -37,7 +37,7 @@ function Timer() {
   const seconds = secondsRemaining % 60;
 
   return (
-    <div className="timer">
+    <div className="finishTimer">
       {mins < 10 && "0"}
       {mins}:{seconds < 10 && "0"}
       {seconds}
