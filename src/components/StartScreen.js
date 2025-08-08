@@ -2,10 +2,12 @@ import { useEffect, useRef, useState } from "react";
 import { useQuiz } from "../contexts/QuizContext";
 
 function StartScreen() {
+  //Создаем переменную, используя useRef
   const buttonRef = useRef();
   const [test, setTest] = useState("test");
   console.log(buttonRef.current);
 
+  //Вызываем ПОСЛЕ первого рендера, используя useEffect
   useEffect(function () {
     console.log(buttonRef.current.getBoundingClientRect());
   }, []);
@@ -27,6 +29,8 @@ function StartScreen() {
           <option value="middle">Middle</option>
           <option value="senior">Senior</option>
         </select>
+
+        {/*Присваиваем props ref кнопке */}
         <button
           className="btn btn-ui"
           onClick={() => dispatch({ type: "start" })}
